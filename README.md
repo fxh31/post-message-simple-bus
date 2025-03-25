@@ -12,7 +12,7 @@ npm install post-message-simple-bus
 
 **主项目：**
 
-> 主项目地址：http://localhost:5200/。
+> 主项目地址：`http://localhost:5200/`。
 
 ```js
 import { CrossFrameEventBus } from 'post-message-simple-bus';
@@ -89,3 +89,59 @@ childBus.onRequest('test_request', async (data, response) => {
 })
 ```
 
+## API
+
+### on()
+
+监听（注册）指定类型事件。
+
+```js
+on(eventType: string, callback: EventCallback): function
+```
+
+- eventType: 事件类型。
+- callback: 注册回调函数。
+  > 该回调函数会在 `emit()` 触发对应 eventType 时执行。
+
+> 返回值：关闭事件监听函数。
+
+### emit()
+
+触发指定类型事件。
+
+```js
+emit(eventType: string, data?: any): void
+```
+
+- eventType: 事件类型。
+- data: 事件参数。
+
+### request()
+
+对指定类型事件发起请求，如果超过指定时间未收到响应，则响应超时异常。
+
+```js
+request(eventType: string, data?: any, timeout?: number): Promise<any>
+```
+
+- eventType: 事件类型。
+- data: 请求参数。
+- timeout: 请求超时时间（ms），默认 5000。
+
+> 返回值：带结果的 Promise 响应。
+ 
+### onRequest()
+
+响应指定类型事件请求，
+
+```js
+type ResponseFunction = (data: any, success?: boolean) => void;
+
+onRequest(eventType: string, handler: (data: any, response: ResponseFunction) => void) : void
+```
+
+- eventType：事件类型。
+- response： 响应函数。
+  - data：响应数据。该数据会作为 `request()` 函数的 Promise 的 resolve 参数。
+  - success：响应结果。
+  > **注意**：如果**没有执行响应函数**或者**指定事件类型没有进行注册**（requset），则会响应超时异常。
