@@ -4,12 +4,14 @@ export type ResponseFunction = (data: any, success?: boolean) => void;
 export class CrossFrameEventBus{
   private listeners = new Map<string, Set<EventCallback>>();
   private pendingRequests = new Map<string, { resolve: Function; reject: Function }>();
+  private targetOriginArray: string[];
 
   constructor(
     private targetWindow: Window,
-    private targetOrigin: string = '*',
+    private targetOrigin: string | string[],
     private debug: boolean = false
   ) {
+    this.targetOriginArray = Array.isArray(targetOrigin) ? targetOrigin : [targetOrigin] as string[];
     this.initListener();
   }
   
@@ -20,7 +22,7 @@ export class CrossFrameEventBus{
   private handleMessage = (event: MessageEvent) => {
     // 安全校验（示例）
     // if (event.origin !== this.targetOrigin) return;
-    const { type, data, isRequest } = event.data || {};
+    const { type, data, isRequest, eventId } = event.data || {};
     if (!type) return;
 
     if (this.debug) {
@@ -58,7 +60,9 @@ export class CrossFrameEventBus{
    * @param data 传递数据
    */
   emit(eventType: string, data?: any) {
-    this.targetWindow.postMessage({ type: eventType, data }, this.targetOrigin);
+    this.targetOriginArray.forEach(origin => {
+      this.targetWindow.postMessage({ type: eventType, data }, origin);
+    });
   }
   
   /**
@@ -68,13 +72,18 @@ export class CrossFrameEventBus{
    * @param timeout 超时时间
    * @returns Promise
    */ 
-  request<T = any>(eventType: string, data?: any, timeout = 5000): Promise<T> {
+  request<T = any>(eventType: string, data?: any, options: {
+    timeout?: number;
+    targetOrigin?: string;
+  } = {}): Promise<T> {
     const eventId = Math.random().toString(36).slice(2);
+    const { timeout = 5000, targetOrigin = this.targetOriginArray[0] } = options;
+    
     return new Promise((resolve, reject) => {
       this.pendingRequests.set(eventId, { resolve, reject });
       this.targetWindow.postMessage(
         { type: eventType, data, eventId, isRequest: true },
-        this.targetOrigin
+        targetOrigin
       );
 
       setTimeout(() => {
