@@ -22,7 +22,7 @@ const iframeWindow = iframe.contentWindow;
 
 const mainBus = new CrossFrameEventBus(
   iframeWindow, // 指定接收端端口（window）
-  'http://localhost:5201/', // 子项目域名（*：通配符）
+  'http://localhost:5201/', // 子项目域名（*：通配符 string | string[]）
   true, // 开启调试模式
 )
 ```
@@ -34,7 +34,7 @@ import { CrossFrameEventBus } from 'post-message-simple-bus';
 
 const childBus = new CrossFrameEventBus(
   window.parent, // 指定接收端端口（window）
-  'http://localhost:5201/', // 子项目域名（*：通配符）
+  'http://localhost:5201/', // 接收方域名（string | string[]）
   true, // 开启调试模式
 )
 ```
@@ -62,11 +62,16 @@ childBus.on('test_event', (res) => {
 如果有异步函数请求，可以以 promise 的形式获取返回值。
 
 ```js
-// 获取请求，可带参数
+// 向指定地址发起请求，可带参数
 async function getRequest() {
-  const res = await mainBus.request('test_request', { name: 'hannah' })
+  const res = await mainBus.request('test_request', { name: 'hannah' }, {
+    timeout: 5000,
+    targetOrigin: 'http://localhost:5201/',
+  })
 }
 ```
+> **注意**：如果不指定 targetOrigin 则默认以初始化的 url（url 数组第一项）为准。
+
 ```js
 function fetchMock(name) {
   const res = {
