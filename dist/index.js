@@ -61,7 +61,7 @@ export class CrossFrameEventBus {
      * @param timeout 超时时间
      * @returns Promise
      */
-    request(eventType, data, options = {}) {
+    request(eventType, data, options) {
         const eventId = Math.random().toString(36).slice(2);
         const { timeout = 5000, targetOrigin = this.targetOriginArray[0] } = options;
         return new Promise((resolve, reject) => {

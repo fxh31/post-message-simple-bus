@@ -1,5 +1,9 @@
 export type EventCallback = (data: any, event?: MessageEvent) => void;
 export type ResponseFunction = (data: any, success?: boolean) => void;
+export interface RequestOptions {
+    timeout?: number;
+    targetOrigin?: string;
+}
 export declare class CrossFrameEventBus {
     private targetWindow;
     private targetOrigin;
@@ -30,10 +34,7 @@ export declare class CrossFrameEventBus {
      * @param timeout 超时时间
      * @returns Promise
      */
-    request<T = any>(eventType: string, data?: any, options?: {
-        timeout?: number;
-        targetOrigin?: string;
-    }): Promise<T>;
+    request<T = any>(eventType: string, data?: any, options?: RequestOptions): Promise<T>;
     /**
      * 监听发送的请求并通过 response 响应结果
      * @param eventType 监听事件类型

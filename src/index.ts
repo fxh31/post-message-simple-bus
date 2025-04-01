@@ -1,6 +1,11 @@
 export type EventCallback = (data: any, event?: MessageEvent) => void;
 export type ResponseFunction = (data: any, success?: boolean) => void;
 
+export interface RequestOptions {
+  timeout?: number;
+  targetOrigin?: string;
+}
+
 export class CrossFrameEventBus{
   private listeners = new Map<string, Set<EventCallback>>();
   private pendingRequests = new Map<string, { resolve: Function; reject: Function }>();
@@ -72,10 +77,7 @@ export class CrossFrameEventBus{
    * @param timeout 超时时间
    * @returns Promise
    */ 
-  request<T = any>(eventType: string, data?: any, options: {
-    timeout?: number;
-    targetOrigin?: string;
-  } = {}): Promise<T> {
+  request<T = any>(eventType: string, data?: any, options?: RequestOptions): Promise<T> {
     const eventId = Math.random().toString(36).slice(2);
     const { timeout = 5000, targetOrigin = this.targetOriginArray[0] } = options;
     
