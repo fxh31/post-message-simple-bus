@@ -65,7 +65,7 @@ childBus.on('test_event', (res) => {
 // 向指定地址发起请求，可带参数
 async function getRequest() {
   const res = await mainBus.request('test_request', { name: 'hannah' }, {
-    timeout: 5000,
+    timeout: 5000, 
     targetOrigin: 'http://localhost:5201/',
   })
 }
@@ -123,15 +123,23 @@ emit(eventType: string, data?: any): void
 
 ### request()
 
-对指定类型事件发起请求，如果超过指定时间未收到响应，则响应超时异常。
+对指定类型事件和指定地址发起请求，如果超过指定时间未收到响应，则响应超时异常。
+
+> **注意**：该方法只能发起一对一请求，即目标地址唯一。
 
 ```js
-request(eventType: string, data?: any, timeout?: number): Promise<any>
+interface RequestOptions {
+  timeout?: number
+  targetOrigin?: string 
+}
+request(eventType: string, data?: any, options?: RequestOptions): Promise<any>
 ```
 
 - eventType: 事件类型。
 - data: 请求参数。
-- timeout: 请求超时时间（ms），默认 5000。
+- options: 请求配置。
+  - timeout: 设置请求超时时间，默认 5000 ms。
+  - targetOrigin: 请求发送地址，默认为初始化填入的地址（或地址数组的第一项）。
 
 > 返回值：带结果的 Promise 响应。
  
