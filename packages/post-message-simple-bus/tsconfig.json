@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "ES2020", // js 语法版本
+    "module": "ES2020", // 模块规范
+    "declaration": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      // "#/*": ["types/*"]
+    },
+    "moduleResolution": "node"
+  },
+  "include": ["src", "types",],
+}
