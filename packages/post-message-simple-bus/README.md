@@ -1,54 +1,56 @@
-# 使用指南
+English | [中文](./README-zh-cn.md)
 
-## 安装
+# Usage Guide
+
+## Installation
 
 ```bash
 npm install post-message-simple-bus
 ```
 
-## 基本使用
+## Basic Usage
 
-### 注册并监听事件
+### Register and Listen for Events
 
-监听指定事件。
+Listen for specified events.
 
 ```js
 import { PostMessageBus } from "post-message-simple-bus";
 
-const postBus = new PostMessageBus(); // 初始化
-// 监听 loaded 事件
+const postBus = new PostMessageBus(); // Initialize
+// Listen for the 'loaded' event
 postBus.on("loaded", (source, data, event) => {
-  // 监听事件内可获取发送消息的源
-  // 在监听事件内可直接借助 source 向其发送消息，不需要配置 options
+  // Inside the event listener, you can get the source of the message
+  // You can directly use 'source' to send messages back without configuring options
   source.emit("token", {
     name: "token from container",
   });
 });
 ```
 
-> **原理**：利用 `window.addEventListener` 监听 message 事件。
+> **Principle**: Uses `window.addEventListener` to listen for message events.
 
-### 发送消息（触发事件）
+### Send Messages (Trigger Events)）
 
-向指定端口发送消息，必须配置 targetWindow 和 targetOrigin。
+Send messages to a specified port, Must configure targetWindow and targetOrigin.
 
 ```js
 import { PostMessageBus } from "post-message-simple-bus";
 
 const postBus = new PostMessageBus({
-  targetOrigin: "http://localhost:5100", // 指定发送地址
-  targetWindow: window.parent, // 指定发送端端口（window）
-}); // 初始化事件总线
+  targetOrigin: "http://localhost:5100", // Specify the target origin
+  targetWindow: window.parent, // Specify the target window
+}); // Initialize the event bus
 
-// 发送 loaded 事件
+// Emit the 'loaded' event
 postBus.emit("loaded", {
   name: "loaded from child",
 });
 ```
 
-### 修改配置
+### Modify Configuration
 
-在某些情况下，初始化时并不能确定发送地址，可通过 change 手动修改配置，再发送消息。
+In some cases, the target configuration may not be known during initialization. Use config to manually update the settings before sending messages.
 
 ```js
 function sendMessage() {
@@ -57,21 +59,21 @@ function sendMessage() {
   postBus.config({
     targetWindow: iframe?.contentWindow,
     targetOrigin: "*",
-  }); // 修改配置
+  }); // Update configuration
 }
 ```
 
-## 注意事项
+## Notes
 
-- 每一个 window 底下都只能初始化一个 PostMessageBus。
-- 注意注册的时机，触发事件前必须先注册。
-- 注意主项目和子项目之间代码的异步执行，均遵循事件循环顺序。
+- Only one instance of `PostMessageBus` should be initialized per window.
+- Ensure events are registered before they are triggered.
+- Be mindful of asynchronous execution between main and child projects, as both follow the event loop order.
 
 ## API
 
 ### on
 
-监听（注册）指定类型事件。
+Listen for (register) events of a specified type.
 
 ```ts
 interface EventCallback {
@@ -82,27 +84,27 @@ interface EventCallback {
 on(eventType: string, callback: EventCallback): void
 ```
 
-- eventType: 事件类型。
-- callback: 注册回调函数。接收三个参数：
-  > 该回调函数会在 `emit()` 触发对应 eventType 时执行。
-  - source: 发送源事件对象。
-  - data: 事件参数。
-  - event: 事件对象。
+- `eventType`: The event type.
+- `callback`: The callback function to register. Receives three parameters:
+  > This callback function executes when emit() triggers the corresponding eventType.
+  - `source`: The source event object of the sender.
+  - `data`: The event data.
+  - `event`: The event object.
 
 ### emit
 
-触发指定类型事件。
+Trigger an event of a specified type.
 
 ```ts
 emit(eventType: string, data?: any): void
 ```
 
-- eventType: 事件类型。
-- data: 传递数据
+- `eventType`: The event type.
+- `data`: The data to transmit.
 
 ### config
 
-修改配置。
+Modify configuration.
 
 ```ts
 export interface PostMessageBusOptions {
@@ -112,10 +114,10 @@ export interface PostMessageBusOptions {
 config(options: PostMessageBusOptions): void
 ```
 
-- options: 配置对象。
-  - targetOrigin: 发送地址。
-  - targetWindow: 发送端端口（window）
+- `options`: Configuration object.
+  - `targetOrigin`: The target origin for sending messages.
+  - `targetWindow`: The target window for sending messages.
 
 ### destroy
 
-销毁事件总线。摧毁当前 window 下所有的 PostMessageBus（message）监听器。
+Destroy the event bus. Removes all PostMessageBus (message) listeners under the current window.

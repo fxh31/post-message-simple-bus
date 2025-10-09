@@ -1,8 +1,8 @@
 # post-message-simple-bus
 
-[使用指南](./packages/post-message-simple-bus/README.md)
+[Quick Start](./packages/post-message-simple-bus/README.md)
 
-## 目录结构
+## Project Structure
 
 ```text
 ├── packages/
